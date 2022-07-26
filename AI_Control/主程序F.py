@@ -18,7 +18,7 @@ import os
 
 # 使用linux的xdotools工具搜索UPBGE窗口
 window = int(
-    subprocess.check_output(["xdotool", "search", "VehiclePhysicsExampleeeveed182"]).decode('ascii').split('\n')[0])
+    subprocess.check_output(["xdotool", "search", "VehiclePhysicsExampleeeveed181"]).decode('ascii').split('\n')[0])
 
 # 交汇路口及其邻近路口载入
 地图交汇点 = '地图交汇点.json'
@@ -62,15 +62,19 @@ N = 15000  # 运行N次后学习
 def 启动TCP客户端():
     bin = None
     global 操作辞典, 服务端打开, 服务器信息, 发送开关, 接收反馈, 避免粘包可发, 图片数组
+    # 设置端口参数，默认端口与服务端一致，port=6666，地址簇ipv4，使用流传输tcp传输控制协议
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(('127.0.0.1', 6666))
     while True:
+        # 初始值都为true
         if 发送开关 and 避免粘包可发:
             try:
-
                 data = str(操作辞典)
+                # 对字符串使用UTF8编码
                 编码结果 = data.encode()
+                # 发送TCP数据，返回发送的字节大小。这个字节长度可能少于实际要发送的数据的长度。
                 s.send(编码结果)
+                # 关闭发送开关，重置按键值
                 避免粘包可发 = False
                 发送开关 = False
                 操作辞典['J按下'] = 0
@@ -88,15 +92,17 @@ def 启动TCP客户端():
                 print("Dialogue Over")
                 s.close()
                 sys.exit(0)
+        # 接受反馈初始值为true
         if 接收反馈:
             开始1 = time.time()
             try:
                 while True:
-
+                    # 制定最大接受的数据量为1024
                     buf = s.recv(1024)
+                    # 若一个buf内数据发送不完，分多次将其存入bin内，避免黏包
                     if bin == None:
                         bin = buf
-
+                        # 服务端组包时，前四个字节表示包的长度，前面为高位，并且有符号位
                         声明长度 = int().from_bytes(bin[0:4], byteorder='big', signed=True)
                         if 声明长度 == len(bin):
                             break
@@ -115,12 +121,15 @@ def 启动TCP客户端():
                         else:
                             break
                 try:
+                    # 将服务端传输的数据进行解码
                     服务器信息, 图片数组 = 解包(bin, window)
                     图片数组应急 = 图片数组
                 except:
+                    # 若解包出错，则拿上一个包中的图片数组应急
                     应急次数 = 应急次数 + 1
                     print('应急次数', 应急次数)
                     图片数组 = 图片数组应急
+                # 接收完一次包后将bin恢复为空，接受包的功能关闭，接收完成后将发送的黏包限制接触
                 bin = None
                 接收反馈 = False
                 避免粘包可发 = True
@@ -130,6 +139,7 @@ def 启动TCP客户端():
                 s.close()
                 sys.exit(0)
         else:
+            # 初始值为true，心跳为false时结束循环，在线程中启动则是结束线程
             if 心跳 != True:
                 break
             time.sleep(0.01)
@@ -141,16 +151,19 @@ def CV信息显示():
     imgNew = 地图.copy()
 
     for i in range(10000000):
-
+        # 初始值为true
         if 更新起点_目标:
+            # 随机起点和终点，规划线路
             起x, 起y, 终x, 终y, 节点列, 角度, 线路总数据 = 取随机始终点()
 
             操作辞典['起x'] = 起x
             操作辞典['起y'] = 起y
             操作辞典['欧拉角Z'] = 角度 - 3.14159 / 2
             # print("角度",角度)
+            # 变换实际坐标为untitled.png终的坐标，其分辨率为358*500
             起x, 起y = 坐标变换(起x, 起y)
             终x, 终y = 坐标变换(终x, 终y)
+            # 显示起点终点的标记
             imgNew1 = cv2ImgAddText(imgNew, "起", 起x, 起y, (111, 255, 0), 15)
             imgNew1 = cv2ImgAddText(imgNew1, "终", 终x, 终y, (0, 111, 255), 15)
             p = 0
@@ -174,11 +187,12 @@ def CV信息显示():
 
         time.sleep(0.1)
 
-
+# 启动tcp和图像显示线程
 TCP客户端 = threading.Thread(target=启动TCP客户端)
 TCP客户端.start()
 CV信息 = threading.Thread(target=CV信息显示)
 CV信息.start()
+
 步数 = 0
 学习次数 = 0
 分数记录 = []
@@ -193,12 +207,16 @@ screen = app.primaryScreen()
 for i in range(6666666):
 
     图片路径 = 训练数据保存目录 + '/{}/'.format(str(int(time.time())))
-    os.mkdir(图片路径)
+    # 源代码有误，不应使用mkdir来创建多层文件夹
+    # os.mkdir(图片路径)
+    os.makedirs(图片路径)
     记录文件 = open(图片路径 + '_操作数据.json', 'w+')
 
     操作辞典 = {'W按下': 0, 'A按下': 0, 'B按下': 0, 'Z按下': 0, 'S按下': 0, 'D按下': 0, 'J按下': 0, 'K按下': 0, 'L按下': 0, 'M按下': 0,
             'P按下': 0, '起x': 0, '起y': 0,
             '欧拉角Z': -1.57}
+
+    # 每次循环再预设参数
     更新起点_目标 = True
     time.sleep(0.1)
     避免粘包可发 = True
@@ -233,18 +251,27 @@ for i in range(6666666):
     位置张量[0, 3] = 服务器信息['载具坐标']['y坐标']
     速度张量[0, 0] = 服务器信息['载具速度']
 
+    # 从xdotool获取的窗口抓图
     img = screen.grabWindow(window)
     image = ImageQt.fromqimage(img)
     image = image.resize((640, 360))
     # image.save("采样.jpg")
+    # 图片转化为数组
     图片数组 = np.asarray(image)
-    截屏 = torch.from_numpy(图片数组).cuda(device).unsqueeze(0).permute(0, 3, 2, 1) / 255
+    # from_numpy: 数组转化为张量
+    # unsqueeze: 在指定位置增加一维度
+    # permute: 维度互换
+    截屏 = torch.from_numpy(图片数组.copy()).cuda(device).unsqueeze(0).permute(0, 3, 2, 1) / 255
     _, out = resnet101(截屏)
+    # reshape为16*16大小
     out = torch.reshape(out, (1, 512, 16 * 16))
+    # cv2.imshow("out image", out)
+    print(type(out))
     图片张量 = out
     角度集张量_序列 = 角度集张量
     位置张量_序列 = 位置张量
     速度张量_序列 = 速度张量
+    # 操作序列转化为张量
     操作张量 = torch.from_numpy(操作序列.astype(np.int64)).cuda(device)
     src_mask, trg_mask = create_masks(操作张量.unsqueeze(0), 操作张量.unsqueeze(0), device)
     状态 = 状态信息综合(图片张量.cpu().numpy(), 角度集张量_序列, 位置张量_序列, 速度张量_序列, trg_mask)
@@ -253,11 +280,13 @@ for i in range(6666666):
     while not 完结:
         计时开始 = time.time()
         步数 += 1
+        # 步数达到15000，学习一次
         if 步数 % N == 0:
             操作辞典['B按下'] = 1
 
         动作, 动作可能性, 评价 = 智能体.选择动作(状态, device)
 
+        # 根据编号，将操作固化
         油门, 左转, 右转 = 编号到动作(动作)
 
         操作辞典['S按下'] = 0
@@ -349,7 +378,7 @@ for i in range(6666666):
         # image.save("采样.jpg")
 
         图片数组 = np.asarray(image)
-        截屏 = torch.from_numpy(图片数组).cuda(device).unsqueeze(0).permute(0, 3, 2, 1) / 255
+        截屏 = torch.from_numpy(图片数组.copy()).cuda(device).unsqueeze(0).permute(0, 3, 2, 1) / 255
         _, out = resnet101(截屏)
         out = torch.reshape(out, (1, 512, 16 * 16))
         计数2 = 计数2 + 1

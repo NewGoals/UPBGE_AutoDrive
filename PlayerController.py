@@ -99,42 +99,42 @@ class PlayerController(bge.types.KX_PythonComponent):
             ForwardRaw, 0.0, SignForward, DeadzoneForward*SignForward, SignForward)
 
         #按键转游戏内变量
-        if k[events.WKEY].values[-1]!=0:
-            全局字典2['W按下']=1
-        else:
-            全局字典2['W按下']=0
-        if k[events.SKEY].values[-1]!=0:
-            全局字典2['S按下']=1
-        else:
-            全局字典2['S按下']=0
-        if k[events.AKEY].values[-1]!=0:
-            全局字典2['A按下']=1
-        else:
-            全局字典2['A按下']=0
-        if k[events.DKEY].values[-1]!=0:
-            全局字典2['D按下']=1
-        else:
-            全局字典2['D按下']=0
-        if k[events.PKEY].values[-1]!=0:
-            全局字典2['P按下']=1
-        else:
-            全局字典2['P按下']=0
-        if k[events.JKEY].values[-1]!=0:
-            全局字典2['J按下']=1
-        else:
-            全局字典2['J按下']=0
-        if k[events.KKEY].values[-1]!=0:
-            全局字典2['K按下']=1
-        else:
-            全局字典2['K按下']=0
-        if k[events.LKEY].values[-1]!=0:
-            全局字典2['L按下']=1
-        else:
-            全局字典2['L按下']=0        
-        if k[events.MKEY].values[-1]!=0:
-            全局字典2['M按下']=1
-        else:
-            全局字典2['M按下']=0    
+        # if k[events.WKEY].values[-1]!=0:
+        #     全局字典2['W按下']=1
+        # else:
+        #     全局字典2['W按下']=0
+        # if k[events.SKEY].values[-1]!=0:
+        #     全局字典2['S按下']=1
+        # else:
+        #     全局字典2['S按下']=0
+        # if k[events.AKEY].values[-1]!=0:
+        #     全局字典2['A按下']=1
+        # else:
+        #     全局字典2['A按下']=0
+        # if k[events.DKEY].values[-1]!=0:
+        #     全局字典2['D按下']=1
+        # else:
+        #     全局字典2['D按下']=0
+        # if k[events.PKEY].values[-1]!=0:
+        #     全局字典2['P按下']=1
+        # else:
+        #     全局字典2['P按下']=0
+        # if k[events.JKEY].values[-1]!=0:
+        #     全局字典2['J按下']=1
+        # else:
+        #     全局字典2['J按下']=0
+        # if k[events.KKEY].values[-1]!=0:
+        #     全局字典2['K按下']=1
+        # else:
+        #     全局字典2['K按下']=0
+        # if k[events.LKEY].values[-1]!=0:
+        #     全局字典2['L按下']=1
+        # else:
+        #     全局字典2['L按下']=0        
+        # if k[events.MKEY].values[-1]!=0:
+        #     全局字典2['M按下']=1
+        # else:
+        #     全局字典2['M按下']=0    
         #Keyboard
 
         

@@ -38,6 +38,7 @@ def 解包(bin, window):
     长度 = bin[0:4]
     声明长度 = int().from_bytes(bin[0:4], byteorder='big', signed=True)
     实际长度 = len(bin)
+    # 实际长度可能因为传输过程中丢包的原因与声明长度存在差异，只有在包完整时才解包
     if 声明长度 == 实际长度:
         内容 = bin[4:实际长度]
         综合信息长度 = int().from_bytes(内容[0:4], byteorder='big', signed=True)
